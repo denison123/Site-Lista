@@ -1,0 +1,186 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+    background-color: #f4f4f9;
+}
+
+h1 {
+    color: #333;
+    margin-bottom: 25px;
+}
+
+/* Estilo do Formulário */
+#form-adicionar {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    padding: 15px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background-color: #fff;
+    flex-wrap: wrap; /* Permite que os campos quebrem em telas pequenas */
+}
+
+#form-adicionar input {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    flex-grow: 1; /* Faz os inputs ocuparem o espaço disponível */
+    min-width: 120px; /* Garante um tamanho mínimo em telas grandes */
+}
+
+#form-adicionar button {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    background-color: #5cb85c;
+    color: white;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+#form-adicionar button:hover {
+    background-color: #4cae4c;
+}
+
+/* Estilo da Tabela */
+#lista-itens {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+#lista-itens th, #lista-itens td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+#lista-itens th {
+    background-color: #f8f8f8;
+    color: #333;
+    font-weight: bold;
+}
+
+#lista-itens .comprado {
+    text-decoration: line-through;
+    color: #888;
+    background-color: #fcfcfc;
+}
+
+#total-container {
+    margin-top: 20px;
+    padding: 15px;
+    background-color: #fff;
+    border-top: 3px solid #007bff;
+    font-weight: bold;
+    font-size: 1.3em;
+    text-align: right;
+    border-radius: 5px;
+}
+
+/* ==================================== */
+/* 2. Responsividade (Media Queries) */
+/* ==================================== */
+
+/* Estilos para telas PEQUENAS (Smartphones - até 600px) */
+@media (max-width: 600px) {
+    
+    body {
+        padding: 10px;
+    }
+
+    #form-adicionar input, 
+    #form-adicionar button {
+        width: 100%; /* Faz com que todos os inputs ocupem a largura total */
+        margin-bottom: 5px;
+    }
+
+    /* Transformando a Tabela em Cartões (Visualização Responsiva) */
+    
+    /* Esconde os cabeçalhos da tabela */
+    #lista-itens thead {
+        display: none;
+    }
+
+    /* Muda o display de todos os elementos da tabela */
+    #lista-itens, 
+    #lista-itens tbody, 
+    #lista-itens tr, 
+    #lista-itens td {
+        display: block;
+        width: 100%;
+    }
+
+    /* Estilo para cada "linha" da lista (que agora é um bloco) */
+    #lista-itens tr {
+        margin-bottom: 15px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        padding: 10px;
+    }
+
+    /* Estilo para cada "célula" (que agora é uma linha dentro do bloco) */
+    #lista-itens td {
+        text-align: right;
+        padding-left: 50%; /* Espaço para o rótulo */
+        position: relative; /* Para posicionar o rótulo */
+        border: none;
+        border-bottom: 1px dotted #eee;
+    }
+
+    /* Adiciona Rótulos (Cabeçalhos da Coluna) antes do valor */
+    #lista-itens td::before {
+        content: attr(data-label); /* Puxa o valor do atributo 'data-label' */
+        position: absolute;
+        left: 10px;
+        width: 45%;
+        padding-right: 10px;
+        white-space: nowrap;
+        font-weight: bold;
+        text-align: left;
+        color: #555;
+    }
+
+    /* Ajuste para a célula de Ações */
+    #lista-itens tr td:last-child {
+        text-align: center;
+        border-bottom: none;
+    }
+
+    /* Ajuste para a célula do checkbox */
+    #lista-itens tr td:first-child {
+        text-align: left;
+    }
+}
+
+/* ==================================== */
+/* 3. Estilos de Edição (NOVO) */
+/* ==================================== */
+
+/* Estilo da célula editável */
+.cell-editable {
+    /* Fundo levemente amarelado para indicar que é clicável/editável */
+    background-color: #fffff0; 
+    border: 1px dashed #ccc;
+    border-radius: 3px;
+    cursor: text;
+    transition: background-color 0.2s;
+}
+
+/* Foco (quando o usuário está editando) */
+.cell-editable:focus {
+    /* Remove a borda padrão do navegador e adiciona um destaque verde */
+    outline: none; 
+    box-shadow: 0 0 0 2px #5cb85c;
+    background-color: #fff;
+}
+
+/* Ajuste para o layout responsivo em mobile */
+@media (max-width: 600px) {
+    #lista-itens td[data-label="Valor Unit. (R$)"] {
+        /* Garante que o fundo do campo editável apareça bem em dispositivos móveis */
+        background-color: #fffff0; 
+    }
+}
