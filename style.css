@@ -545,3 +545,175 @@ h1, h2, h3 {
 .footer .admin-link:hover {
     color: #e6c200;
 }
+/* ==================================== */
+/* 8. Seção do Book de Fotos (Gallery)  */
+/* ==================================== */
+.gallery-section {
+    padding: 60px 0;
+    text-align: center;
+    background-color: #fcfcfc; /* Um fundo quase branco para destacar */
+}
+
+.gallery-section h2 {
+    font-size: 2.5em;
+    margin-bottom: 20px;
+    position: relative;
+    padding-bottom: 15px;
+}
+.gallery-section h2::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 0;
+    width: 120px;
+    height: 4px;
+    background-color: #FFD700;
+    border-radius: 2px;
+}
+
+.gallery-section p {
+    font-size: 1.1em;
+    color: #666;
+    margin-bottom: 40px;
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* 3 colunas em telas maiores, ajusta em menores */
+    gap: 25px; /* Espaçamento entre as fotos */
+    margin-top: 30px;
+}
+
+.gallery-item {
+    background-color: #fff;
+    border-radius: 10px;
+    overflow: hidden; /* Garante que a imagem não vaze dos cantos arredondados */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.gallery-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.gallery-item img {
+    width: 100%;
+    height: 250px; /* Altura fixa para as imagens */
+    object-fit: cover; /* Recorta a imagem para cobrir o espaço sem distorcer */
+    display: block; /* Remove espaço extra abaixo da imagem */
+    transition: transform 0.5s ease;
+}
+
+.gallery-item:hover img {
+    transform: scale(1.05); /* Um pequeno zoom ao passar o mouse */
+}
+
+
+/* ==================================== */
+/* 9. Rodapé (Footer)                   */
+/* (Este é o seu código de rodapé existente, apenas ajustando o número da seção) */
+/* ==================================== */
+.footer {
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    padding: 20px 0;
+    font-size: 0.9em;
+}
+
+.footer .admin-link {
+    color: #FFD700;
+    font-weight: bold;
+    margin-left: 10px;
+    text-decoration: underline;
+}
+.footer .admin-link:hover {
+    color: #e6c200;
+}
+
+/* ==================================== */
+/* 10. Media Queries para Responsividade */
+/* (Você já deve ter algumas, esta é uma adição para a galeria) */
+/* ==================================== */
+@media (max-width: 768px) {
+    .gallery-grid {
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 15px;
+    }
+    .gallery-item img {
+        height: 200px;
+    }
+}
+
+@media (max-width: 480px) {
+    .gallery-grid {
+        grid-template-columns: 1fr; /* Uma coluna em telas muito pequenas */
+    }
+    .gallery-item img {
+        height: 180px;
+    }
+    .gallery-section h2 {
+        font-size: 2em;
+    }
+    .gallery-section p {
+        font-size: 1em;
+    }
+}
+/* ==================================== */
+/* 11. Botões Flutuantes de Redes Sociais */
+/* ==================================== */
+.social-buttons {
+    position: fixed; /* Fixa na tela */
+    bottom: 30px; /* Distância do fundo */
+    right: 30px; /* Distância da direita */
+    z-index: 1000; /* Garante que fiquem acima de outros elementos */
+    display: flex;
+    flex-direction: column; /* Um botão abaixo do outro */
+    gap: 15px; /* Espaço entre os botões */
+}
+
+.social-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 55px; /* Tamanho do botão */
+    height: 55px;
+    border-radius: 50%; /* Formato circular */
+    font-size: 2em; /* Tamanho do ícone */
+    color: #fff; /* Cor do ícone */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.social-button:hover {
+    transform: translateY(-5px) scale(1.05); /* Efeito de "subir" e pequeno zoom */
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+
+.social-button.whatsapp {
+    background-color: #25D366; /* Cor oficial do WhatsApp */
+}
+
+.social-button.instagram {
+    /* Gradiente do Instagram */
+    background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%);
+}
+
+/* Ajuste para telas menores */
+@media (max-width: 600px) {
+    .social-buttons {
+        bottom: 20px;
+        right: 20px;
+        gap: 10px;
+    }
+    .social-button {
+        width: 48px;
+        height: 48px;
+        font-size: 1.8em;
+    }
+}
