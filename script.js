@@ -53,10 +53,10 @@ const serviceInterval = 1; // Intervalo de 1 hora entre os serviços
 
 // LISTA DE SERVIÇOS COM PREÇOS para lógica de cálculo
 const servicesList = {
-    "Corte Clássico": 40.00,
-    "Barba Tradicional": 35.00,
-    "Corte + Barba": 70.00,
-    "Acabamento": 20.00
+    "Corte Clássico": 10.00,
+    "Barba Tradicional": 10.00,
+    "Corte + Barba": 10.00,
+    "Acabamento": 10.00
 };
 
 // ==========================================================
