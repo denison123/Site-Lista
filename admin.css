@@ -79,18 +79,16 @@ h1, h2, h3 {
 }
 
 .admin-header .logo {
-    /* --- ALTERAÇÃO AQUI: Diminuindo o logo --- */
-    height: 45px; /* Reduzido de 60px para 45px */
+    height: 35px; /* Altura do logo */
     vertical-align: middle;
 }
 
 .admin-header .admin-nav ul {
     list-style: none;
     display: flex; /* Para os itens ficarem lado a lado */
-    /* --- ALTERAÇÃO AQUI: Alinhamento da navegação --- */
     align-items: center; /* Alinha os itens verticalmente no centro */
-    margin: 0; /* Garante que não há margens indesejadas */
-    padding: 0; /* Garante que não há padding indesejadas */
+    margin: 0;
+    padding: 0;
 }
 
 .admin-header .admin-nav ul li {

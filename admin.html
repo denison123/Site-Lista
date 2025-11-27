@@ -3,53 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Barbearia 115 - Área do Barbeiro</title>
-    <link rel="stylesheet" href="admin.css">
+    <title>Barbearia 115 - Área Administrativa</title>
+    <link rel="stylesheet" href="admin.css"> 
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;700&family=Roboto+Slab:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body class="admin-body">
-    <header class="header">
+    <header class="admin-header">
         <div class="container">
             <img src="barbearia115-logo.png" alt="Barbearia 115 Logo" class="logo">
-            <nav class="main-nav">
+            <nav class="admin-nav">
                 <ul>
                     <li><a href="index.html">Agendamento Cliente</a></li>
-                    <li><a href="#" id="logoutBtn">Sair</a></li>
+                    <li><a href="#" id="logoutBtn" style="display:none;">Sair</a></li>
                 </ul>
             </nav>
         </div>
     </header>
 
-    <main class="main-content container admin-content">
-        <section class="admin-login-section" id="adminLogin" style="display: block;">
+    <main class="admin-content container">
+        <section id="adminLogin" class="admin-login-section">
             <h2>Acesso Restrito - Barbeiro</h2>
-            <div class="login-form">
+            <form class="login-form">
                 <label for="adminEmail">E-mail:</label>
                 <input type="email" id="adminEmail" placeholder="seu@email.com" required>
-
+                
                 <label for="adminPassword">Senha:</label>
                 <input type="password" id="adminPassword" placeholder="Sua senha" required>
-
-                <button id="loginBtn" class="confirm-button">Entrar</button>
+                
+                <button type="button" id="loginBtn" class="button-base">Entrar</button>
                 <p id="loginError" class="error-message"></p>
-            </div>
+            </form>
         </section>
 
-        <section class="admin-dashboard-section" id="adminDashboard" style="display: none;">
+        <section id="adminDashboard" class="admin-dashboard-section" style="display: none;">
             <h2>Agendamentos de Hoje</h2>
+            
             <div class="dashboard-controls">
                 <button id="prevDayBtn" class="nav-button">&lt; Anterior</button>
-                <h3 id="currentAdminDate">Data Atual</h3>
+                <h3 id="currentAdminDate">quinta-feira, 27 de novembro de 2025</h3>
                 <button id="nextDayBtn" class="nav-button">Próximo &gt;</button>
             </div>
-            
+
             <div id="appointmentsList" class="appointments-list">
-                <p class="no-appointments">Nenhum agendamento para esta data.</p>
+                <p class="loading-message">Carregando agendamentos...</p>
             </div>
+            
         </section>
     </main>
 
-    <footer class="footer">
+    <footer class="admin-footer">
         <div class="container">
             <p>© 2023 Barbearia 115. Área Administrativa.</p>
         </div>
