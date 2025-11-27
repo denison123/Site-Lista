@@ -15,7 +15,7 @@ body {
 }
 
 .container {
-    max-width: 1500px;
+    max-width: 1200px;
     margin: 0 auto;
     padding: 0 20px;
 }
@@ -79,13 +79,18 @@ h1, h2, h3 {
 }
 
 .admin-header .logo {
-    height: 60px;
+    /* --- ALTERAÇÃO AQUI: Diminuindo o logo --- */
+    height: 45px; /* Reduzido de 60px para 45px */
     vertical-align: middle;
 }
 
 .admin-header .admin-nav ul {
     list-style: none;
     display: flex; /* Para os itens ficarem lado a lado */
+    /* --- ALTERAÇÃO AQUI: Alinhamento da navegação --- */
+    align-items: center; /* Alinha os itens verticalmente no centro */
+    margin: 0; /* Garante que não há margens indesejadas */
+    padding: 0; /* Garante que não há padding indesejadas */
 }
 
 .admin-header .admin-nav ul li {
