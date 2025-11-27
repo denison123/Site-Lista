@@ -3,43 +3,129 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lista de Supermercado</title>
+    <title>Barbearia 115 - Agendamento</title>
     <link rel="stylesheet" href="style.css">
-
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;700&family=Roboto+Slab:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <h1>Lista de Supermercado 📝</h1>
+    <header class="header">
+        <div class="container">
+            <img src="barbearia115-logo.png" alt="Barbearia 115 Logo" class="logo">
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="#agendamento">Agendar</a></li>
+                    <li><a href="#servicos">Serviços</a></li>
+                    <li><a href="#contato">Contato</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
 
-    <form id="form-adicionar">
-        <input type="text" id="item-nome" placeholder="Nome do Item" required>
-        <input type="number" id="item-quantidade" placeholder="Qtd" min="1" required>
-        <input type="number" id="item-valor" placeholder="Valor Unitário (R$)" min="0.01" step="0.01" required>
-        <button type="submit">Adicionar</button>
-    </form>
+    <main class="main-content container" id="agendamento">
+        <section class="booking-section">
+            <h2>Agende seu Horário na Barbearia 115</h2>
+            <p>Selecione a data e o horário desejado para o seu serviço.</p>
+
+            <div class="calendar-booking-container">
+                <div class="calendar-wrapper">
+                    <div class="calendar-header">
+                        <button id="prevMonth" class="nav-button"><</button>
+                        <h3 id="currentMonthYear">Mês Ano</h3>
+                        <button id="nextMonth" class="nav-button">></button>
+                    </div>
+                    <div class="calendar-grid" id="calendarGrid">
+                        </div>
+                </div>
+
+                <div class="time-slots-wrapper">
+                    <h3>Horários Disponíveis</h3>
+                    
+                    <div id="timeSlots" class="time-slots-grid">
+                        <p class="no-slots">Selecione uma data para ver os horários.</p>
+                    </div>
+                    
+                    <div id="bookingDetails" class="booking-details-form" style="display: none;">
+                        <h3>Detalhes do Agendamento</h3>
+                        
+                        <label for="clientName">Seu Nome:</label>
+                        <input type="text" id="clientName" placeholder="Seu nome completo" required>
+
+                        <label for="clientContact">Seu Contato (Telefone/WhatsApp):</label>
+                        <input type="tel" id="clientContact" placeholder="(XX) XXXXX-XXXX" required>
+
+                        <label for="serviceSelect">Serviço Desejado:</label>
+                        <select id="serviceSelect" required>
+                            <option value="" disabled selected>Selecione um Serviço</option>
+                            <option value="Corte Clássico">Corte Clássico</option>
+                            <option value="Barba Tradicional">Barba Tradicional</option>
+                            <option value="Corte + Barba">Corte + Barba</option>
+                            <option value="Acabamento">Acabamento</option>
+                        </select>
+
+                        <label for="paymentMethod">Forma de Pagamento:</label>
+                        <select id="paymentMethod" required>
+                            <option value="" disabled selected>Selecione a Forma</option>
+                            <option value="Dinheiro">Dinheiro</option>
+                            <option value="Cartão de Crédito/Débito">Cartão de Crédito/Débito</option>
+                            <option value="PIX">PIX</option>
+                        </select>
+                        
+                        <p class="selected-info">Total: <span id="totalPrice">R$ 0,00</span></p>
+                    </div>
+
+                    <button id="confirmBooking" class="confirm-button" disabled>Confirmar Agendamento</button>
+                    <p id="selectedDateTime" class="selected-info"></p>
+                </div>
+            </div>
+        </section>
+
+        <section class="services-section" id="servicos">
+            <h2>Nossos Serviços</h2>
+            <div class="service-list">
+                <div class="service-item">
+                    <h3>Corte Clássico</h3>
+                    <p>Um corte de cabelo atemporal e elegante.</p>
+                    <span>R$ 40,00</span>
+                </div>
+                <div class="service-item">
+                    <h3>Barba Tradicional</h3>
+                    <p>Barbear com toalha quente e finalização perfeita.</p>
+                    <span>R$ 35,00</span>
+                </div>
+                <div class="service-item">
+                    <h3>Corte + Barba</h3>
+                    <p>Combo completo para um visual impecável.</p>
+                    <span>R$ 70,00</span>
+                </div>
+                <div class="service-item">
+                    <h3>Acabamento</h3>
+                    <p>Retoque rápido para manter o estilo.</p>
+                    <span>R$ 20,00</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="contact-section" id="contato">
+            <h2>Onde Estamos</h2>
+            <p>Rua Exemplo, 115 - Bairro Centro - Sua Cidade</p>
+            <p>Telefone: (XX) XXXX-XXXX</p>
+            <p>Email: contato@barbearia115.com</p>
+            <div class="map-container">
+                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3022.4496030919933!2d-73.99616098459461!3d40.74844097932822!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89c25983f4f1a26d%3A0x1d4a9f4d4a4a4a4!2sEmpire%20State%20Building!5e0!3m2!1spt-BR!2sbr!4v1625078000000!5m2!1spt-BR!2sbr" 
+                        width="100%" height="300" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>© 2023 Barbearia 115. Todos os direitos reservados. <a href="admin.html" class="admin-link">Área do Barbeiro</a></p>
+        </div>
+    </footer>
+
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
     
-    <hr>
-
-    <table id="lista-itens">
-        <thead>
-            <tr>
-                <th>Comprado</th>
-                <th>Item</th>
-                <th>Quantidade</th>
-                <th>Valor Unit. (R$)</th>
-                <th>Total (R$)</th>
-                <th>Ações</th>
-            </tr>
-        </thead>
-        <tbody>
-            </tbody>
-    </table>
-
-    <hr>
-
-    <div id="total-container">
-        Total Estimado: <span id="valor-total">R$ 0.00</span>
-    </div>
-
     <script src="script.js"></script>
 </body>
 </html>

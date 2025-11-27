@@ -1,0 +1,322 @@
+/* ==================================== */
+/* 1. Reset Básico e Estilos Gerais (Admin) */
+/* ==================================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Roboto Slab', serif;
+    line-height: 1.6;
+    color: #333;
+    background-color: #f4f4f4; /* Fundo mais claro para o admin */
+}
+
+.container {
+    max-width: 1500px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+a {
+    color: #FFD700; /* Amarelo dourado para links */
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+a:hover {
+    color: #e6c200; /* Um amarelo um pouco mais escuro no hover */
+}
+
+/* Títulos */
+h1, h2, h3 {
+    font-family: 'Oswald', sans-serif;
+    color: #222;
+    margin-bottom: 15px;
+}
+
+/* Botões base */
+.button-base { /* Um estilo base para botões do admin */
+    background-color: #FFD700;
+    color: #222;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1.1em;
+    font-weight: bold;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.button-base:hover {
+    background-color: #e6c200;
+    transform: translateY(-2px);
+}
+
+.button-base:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+    transform: none;
+    opacity: 0.7;
+}
+
+/* ==================================== */
+/* 2. Cabeçalho (Header) do Admin       */
+/* ==================================== */
+.admin-header {
+    background-color: #222;
+    color: #fff;
+    padding: 15px 0;
+    border-bottom: 5px solid #FFD700;
+}
+
+.admin-header .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.admin-header .logo {
+    height: 60px;
+    vertical-align: middle;
+}
+
+.admin-header .admin-nav ul {
+    list-style: none;
+    display: flex; /* Para os itens ficarem lado a lado */
+}
+
+.admin-header .admin-nav ul li {
+    margin-left: 25px;
+}
+
+.admin-header .admin-nav ul li a {
+    color: #fff;
+    font-family: 'Oswald', sans-serif;
+    font-size: 1.1em;
+    padding: 5px 0;
+    position: relative;
+}
+
+.admin-header .admin-nav ul li a::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 0;
+    height: 2px;
+    background-color: #FFD700;
+    transition: width 0.3s ease;
+}
+
+.admin-header .admin-nav ul li a:hover::after {
+    width: 100%;
+}
+
+
+/* ==================================== */
+/* 3. Conteúdo Principal (Admin)        */
+/* ==================================== */
+.admin-content {
+    padding-top: 50px;
+    padding-bottom: 50px;
+}
+
+/* ==================================== */
+/* 4. Seção de Login (Admin)            */
+/* ==================================== */
+.admin-login-section {
+    max-width: 450px;
+    margin: 50px auto;
+    background-color: #fff;
+    padding: 35px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.admin-login-section h2 {
+    font-size: 2em;
+    color: #222;
+    margin-bottom: 25px;
+}
+
+.login-form label {
+    display: block;
+    text-align: left;
+    margin-top: 15px;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: #555;
+    font-size: 0.95em;
+}
+
+.login-form input[type="email"],
+.login-form input[type="password"] {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1em;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.login-form input[type="email"]:focus,
+.login-form input[type="password"]:focus {
+    border-color: #FFD700;
+    box-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
+    outline: none;
+}
+
+.login-form .button-base { /* Reutiliza o estilo base para o botão de login */
+    margin-top: 20px;
+    width: 100%;
+    font-size: 1.2em; /* Um pouco maior para o botão principal */
+}
+
+.error-message {
+    color: #dc3545; /* Vermelho para mensagens de erro */
+    margin-top: 15px;
+    font-weight: bold;
+}
+
+/* ==================================== */
+/* 5. Seção do Dashboard de Agendamentos (Admin) */
+/* ==================================== */
+.admin-dashboard-section {
+    max-width: 900px;
+    margin: 30px auto;
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.admin-dashboard-section h2 {
+    text-align: center;
+    font-size: 2em;
+    color: #222;
+    margin-bottom: 25px;
+    position: relative;
+    padding-bottom: 10px;
+}
+.admin-dashboard-section h2::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 0;
+    width: 80px;
+    height: 4px;
+    background-color: #FFD700;
+    border-radius: 2px;
+}
+
+.dashboard-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    background-color: #222;
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 8px;
+}
+
+.dashboard-controls h3 {
+    color: #fff;
+    margin: 0;
+    font-size: 1.5em;
+    text-align: center;
+    flex-grow: 1; /* Ocupa o espaço central */
+}
+
+/* Botões de navegação de dia */
+.dashboard-controls .nav-button {
+    background-color: #FFD700;
+    color: #222;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 1em;
+    transition: background-color 0.3s ease;
+}
+
+.dashboard-controls .nav-button:hover {
+    background-color: #e6c200;
+}
+
+/* Lista de Agendamentos */
+.appointments-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Colunas flexíveis */
+    gap: 20px;
+}
+
+.appointment-item {
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-left: 5px solid #FFD700; /* Borda lateral amarela para destacar */
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* Empurra o botão de excluir para baixo */
+}
+
+.appointment-item p {
+    margin-bottom: 8px;
+    color: #444;
+}
+
+.appointment-item p strong {
+    color: #222;
+}
+
+.appointment-item .delete-appointment-btn {
+    background-color: #dc3545; /* Vermelho para exclusão */
+    color: #fff;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 0.9em;
+    margin-top: 15px; /* Espaço acima do botão */
+    transition: background-color 0.3s ease;
+    align-self: flex-start; /* Alinha o botão à esquerda dentro do item */
+}
+
+.appointment-item .delete-appointment-btn:hover {
+    background-color: #c82333;
+}
+
+.loading-message, .no-appointments, .error-message {
+    text-align: center;
+    padding: 20px;
+    font-style: italic;
+    color: #777;
+}
+
+.error-message {
+    color: #dc3545;
+    font-weight: bold;
+}
+
+/* ==================================== */
+/* 6. Rodapé (Footer) do Admin          */
+/* ==================================== */
+.admin-footer {
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    padding: 20px 0;
+    font-size: 0.9em;
+    margin-top: 50px; /* Garante espaço entre o dashboard e o footer */
+}

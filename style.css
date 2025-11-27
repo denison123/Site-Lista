@@ -1,186 +1,547 @@
-body {
-    font-family: Arial, sans-serif;
+/* ==================================== */
+/* 1. Reset Básico e Estilos Gerais     */
+/* ==================================== */
+* {
     margin: 0;
-    padding: 20px;
-    background-color: #f4f4f9;
+    padding: 0;
+    box-sizing: border-box;
 }
 
-h1 {
+body {
+    font-family: 'Roboto Slab', serif;
+    line-height: 1.6;
     color: #333;
-    margin-bottom: 25px;
+    background-color: #f4f4f4;
 }
 
-/* Estilo do Formulário */
-#form-adicionar {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
-    padding: 15px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    background-color: #fff;
-    flex-wrap: wrap; /* Permite que os campos quebrem em telas pequenas */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
 }
 
-#form-adicionar input {
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    flex-grow: 1; /* Faz os inputs ocuparem o espaço disponível */
-    min-width: 120px; /* Garante um tamanho mínimo em telas grandes */
+a {
+    color: #FFD700; /* Amarelo dourado para links */
+    text-decoration: none;
+    transition: color 0.3s ease;
 }
 
-#form-adicionar button {
-    padding: 10px 15px;
+a:hover {
+    color: #e6c200; /* Um amarelo um pouco mais escuro no hover */
+}
+
+/* Títulos */
+h1, h2, h3 {
+    font-family: 'Oswald', sans-serif;
+    color: #222;
+    margin-bottom: 15px;
+}
+
+/* Botões base */
+.confirm-button, .nav-button {
+    background-color: #FFD700;
+    color: #222;
     border: none;
+    padding: 12px 25px;
     border-radius: 5px;
-    background-color: #5cb85c;
-    color: white;
+    cursor: pointer;
+    font-size: 1.1em;
+    font-weight: bold;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.confirm-button:hover, .nav-button:hover {
+    background-color: #e6c200;
+    transform: translateY(-2px);
+}
+
+.confirm-button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+    transform: none;
+    opacity: 0.7;
+}
+
+
+/* ==================================== */
+/* 2. Cabeçalho (Header)                */
+/* ==================================== */
+.header {
+    background-color: #222;
+    color: #fff;
+    padding: 15px 0;
+    border-bottom: 5px solid #FFD700; /* Linha amarela abaixo do header */
+}
+
+.header .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    height: 60px; /* Ajuste o tamanho do logo */
+    vertical-align: middle;
+}
+
+.main-nav ul {
+    list-style: none;
+}
+
+.main-nav ul li {
+    display: inline-block;
+    margin-left: 25px;
+}
+
+.main-nav ul li a {
+    color: #fff;
+    font-family: 'Oswald', sans-serif;
+    font-size: 1.1em;
+    padding: 5px 0;
+    position: relative;
+}
+
+.main-nav ul li a::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 0;
+    height: 2px;
+    background-color: #FFD700;
+    transition: width 0.3s ease;
+}
+
+.main-nav ul li a:hover::after,
+.main-nav ul li a.active::after { /* Adicione 'active' se quiser marcar a página atual */
+    width: 100%;
+}
+
+
+/* ==================================== */
+/* 3. Conteúdo Principal (Main Content) */
+/* ==================================== */
+.main-content {
+    padding: 40px 0;
+}
+
+
+/* ==================================== */
+/* 4. Calendário e Horários             */
+/* ==================================== */
+.calendar-booking-container {
+    display: flex;
+    gap: 30px;
+    margin-top: 30px;
+    flex-wrap: wrap; /* Permite que os itens quebrem a linha em telas pequenas */
+}
+
+.calendar-wrapper, .time-slots-wrapper {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    flex: 1; /* Faz com que ambos ocupem espaço similar */
+    min-width: 300px; /* Garante um tamanho mínimo para evitar colapso */
+}
+
+.calendar-wrapper {
+    flex: 1.2; /* Calendário pode ser um pouco maior */
+}
+.time-slots-wrapper {
+    flex: 1;
+}
+
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    background-color: #222;
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 8px;
+}
+
+.calendar-header h3 {
+    color: #fff;
+    margin: 0;
+    font-size: 1.5em;
+}
+
+.calendar-header .nav-button {
+    background-color: #FFD700;
+    color: #222;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
     cursor: pointer;
     font-weight: bold;
+    font-size: 1.2em;
+}
+.calendar-header .nav-button:hover {
+    background-color: #e6c200;
 }
 
-#form-adicionar button:hover {
-    background-color: #4cae4c;
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr); /* 7 colunas para os dias da semana */
+    gap: 10px;
+    text-align: center;
 }
 
-/* Estilo da Tabela */
-#lista-itens {
-    width: 100%;
-    border-collapse: collapse;
+.day-name {
+    font-weight: bold;
+    color: #555;
+    padding: 10px 0;
+    background-color: #eee;
+    border-radius: 5px;
+    font-family: 'Oswald', sans-serif;
+    font-size: 0.9em;
+}
+
+.day-cell {
+    padding: 15px 0;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+    font-size: 1.1em;
+    font-weight: bold;
+    color: #444;
+}
+
+.day-cell:hover:not(.disabled):not(.selected) {
+    background-color: #e0e0e0;
+    transform: translateY(-2px);
+}
+
+.day-cell.disabled {
+    background-color: #f0f0f0;
+    color: #aaa;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.day-cell.today {
+    border: 2px solid #FFD700;
+    background-color: #fff7e6;
+}
+
+.day-cell.selected {
+    background-color: #FFD700;
+    color: #222;
+    box-shadow: 0 0 8px rgba(255, 215, 0, 0.5);
+    transform: translateY(-2px);
+}
+
+.empty {
+    background-color: transparent;
+    cursor: default;
+}
+
+/* Horários */
+.time-slots-wrapper h3 {
+    text-align: center;
+    margin-bottom: 25px;
+    color: #333;
+    font-size: 1.8em;
+    position: relative;
+    padding-bottom: 10px;
+}
+.time-slots-wrapper h3::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 0;
+    width: 60px;
+    height: 3px;
+    background-color: #FFD700;
+    border-radius: 2px;
+}
+
+
+.time-slots-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)); /* Colunas para horários */
+    gap: 10px;
     margin-bottom: 20px;
 }
 
-#lista-itens th, #lista-itens td {
-    padding: 12px;
-    text-align: left;
-    border-bottom: 1px solid #ddd;
-}
-
-#lista-itens th {
-    background-color: #f8f8f8;
-    color: #333;
-    font-weight: bold;
-}
-
-#lista-itens .comprado {
-    text-decoration: line-through;
-    color: #888;
-    background-color: #fcfcfc;
-}
-
-#total-container {
-    margin-top: 20px;
-    padding: 15px;
-    background-color: #fff;
-    border-top: 3px solid #007bff;
-    font-weight: bold;
-    font-size: 1.3em;
-    text-align: right;
+.time-slot {
+    padding: 12px 0;
+    background-color: #f0f0f0;
+    border: 1px solid #ddd;
     border-radius: 5px;
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+    font-weight: bold;
+    color: #555;
+}
+
+.time-slot:hover:not(.booked):not(.disabled):not(.selected) {
+    background-color: #e0e0e0;
+    border-color: #bbb;
+}
+
+.time-slot.booked {
+    background-color: #f0a0a0; /* Vermelho claro para ocupado */
+    color: #a00;
+    cursor: not-allowed;
+    border-color: #d00;
+    opacity: 0.7;
+}
+
+.time-slot.disabled {
+    background-color: #e8e8e8;
+    color: #999;
+    cursor: not-allowed;
+    border-color: #ccc;
+    opacity: 0.5;
+}
+
+.time-slot.selected {
+    background-color: #FFD700;
+    color: #222;
+    border-color: #e6c200;
+    box-shadow: 0 0 8px rgba(255, 215, 0, 0.5);
+}
+
+.no-slots {
+    grid-column: 1 / -1; /* Ocupa toda a largura da grid */
+    text-align: center;
+    color: #777;
+    font-style: italic;
+    padding: 20px 0;
+}
+
+.selected-info {
+    text-align: center;
+    margin-top: 15px;
+    font-size: 1.1em;
+    font-weight: bold;
+    color: #444;
+}
+
+/* Botão de confirmação de agendamento */
+.booking-section .confirm-button {
+    display: block; /* Ocupa a largura total */
+    width: 100%;
+    margin-top: 25px;
+    padding: 15px 30px;
+    font-size: 1.2em;
 }
 
 /* ==================================== */
-/* 2. Responsividade (Media Queries) */
+/* 5. Detalhes do Agendamento (Form)    */
 /* ==================================== */
-
-/* Estilos para telas PEQUENAS (Smartphones - até 600px) */
-@media (max-width: 600px) {
-    
-    body {
-        padding: 10px;
-    }
-
-    #form-adicionar input, 
-    #form-adicionar button {
-        width: 100%; /* Faz com que todos os inputs ocupem a largura total */
-        margin-bottom: 5px;
-    }
-
-    /* Transformando a Tabela em Cartões (Visualização Responsiva) */
-    
-    /* Esconde os cabeçalhos da tabela */
-    #lista-itens thead {
-        display: none;
-    }
-
-    /* Muda o display de todos os elementos da tabela */
-    #lista-itens, 
-    #lista-itens tbody, 
-    #lista-itens tr, 
-    #lista-itens td {
-        display: block;
-        width: 100%;
-    }
-
-    /* Estilo para cada "linha" da lista (que agora é um bloco) */
-    #lista-itens tr {
-        margin-bottom: 15px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-        padding: 10px;
-    }
-
-    /* Estilo para cada "célula" (que agora é uma linha dentro do bloco) */
-    #lista-itens td {
-        text-align: right;
-        padding-left: 50%; /* Espaço para o rótulo */
-        position: relative; /* Para posicionar o rótulo */
-        border: none;
-        border-bottom: 1px dotted #eee;
-    }
-
-    /* Adiciona Rótulos (Cabeçalhos da Coluna) antes do valor */
-    #lista-itens td::before {
-        content: attr(data-label); /* Puxa o valor do atributo 'data-label' */
-        position: absolute;
-        left: 10px;
-        width: 45%;
-        padding-right: 10px;
-        white-space: nowrap;
-        font-weight: bold;
-        text-align: left;
-        color: #555;
-    }
-
-    /* Ajuste para a célula de Ações */
-    #lista-itens tr td:last-child {
-        text-align: center;
-        border-bottom: none;
-    }
-
-    /* Ajuste para a célula do checkbox */
-    #lista-itens tr td:first-child {
-        text-align: left;
-    }
+.booking-details-form {
+    background-color: #f0f0f0; /* Um cinza claro para destacar do fundo branco principal */
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 25px;
+    margin-top: 20px; /* Espaço entre os horários e o formulário */
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
 }
 
-/* ==================================== */
-/* 3. Estilos de Edição (NOVO) */
-/* ==================================== */
-
-/* Estilo da célula editável */
-.cell-editable {
-    /* Fundo levemente amarelado para indicar que é clicável/editável */
-    background-color: #fffff0; 
-    border: 1px dashed #ccc;
-    border-radius: 3px;
-    cursor: text;
-    transition: background-color 0.2s;
+.booking-details-form h3 {
+    text-align: center;
+    color: #333;
+    font-size: 1.6em;
+    margin-bottom: 20px;
+    position: relative;
+    padding-bottom: 10px;
 }
 
-/* Foco (quando o usuário está editando) */
-.cell-editable:focus {
-    /* Remove a borda padrão do navegador e adiciona um destaque verde */
-    outline: none; 
-    box-shadow: 0 0 0 2px #5cb85c;
+.booking-details-form h3::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 0;
+    width: 60px;
+    height: 3px;
+    background-color: #FFD700; /* Amarelo do logo */
+    border-radius: 2px;
+}
+
+.booking-details-form label {
+    display: block; /* Cada label em uma nova linha */
+    font-weight: bold;
+    color: #555;
+    margin-top: 15px; /* Espaço entre os campos */
+    margin-bottom: 8px;
+    font-size: 0.95em;
+}
+
+.booking-details-form input[type="text"],
+.booking-details-form input[type="tel"],
+.booking-details-form select {
+    width: 100%; /* Ocupa a largura total disponível */
+    padding: 12px;
+    margin-bottom: 10px; /* Espaço entre o campo e o próximo label/campo */
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1em;
     background-color: #fff;
+    color: #333;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-/* Ajuste para o layout responsivo em mobile */
-@media (max-width: 600px) {
-    #lista-itens td[data-label="Valor Unit. (R$)"] {
-        /* Garante que o fundo do campo editável apareça bem em dispositivos móveis */
-        background-color: #fffff0; 
-    }
+.booking-details-form input[type="text"]:focus,
+.booking-details-form input[type="tel"]:focus,
+.booking-details-form select:focus {
+    border-color: #FFD700; /* Borda amarela ao focar */
+    box-shadow: 0 0 5px rgba(255, 215, 0, 0.5); /* Sombra amarela suave */
+    outline: none; /* Remove o outline padrão do navegador */
+}
+
+/* Estilo para a opção placeholder/selecione */
+.booking-details-form select option[disabled]:first-child {
+    color: #999;
+}
+
+/* Estilo para a linha do Total */
+.booking-details-form .selected-info {
+    text-align: right;
+    font-weight: bold;
+    color: #222;
+    font-size: 1.2em;
+    margin-top: 20px;
+    padding-top: 10px;
+    border-top: 1px dashed #ccc; /* Linha tracejada para separar */
+}
+
+.booking-details-form #totalPrice {
+    color: #FFD700; /* Destaca o preço total em amarelo */
+    font-size: 1.3em;
+}
+
+
+/* ==================================== */
+/* 6. Seção de Serviços                 */
+/* ==================================== */
+.services-section {
+    padding: 50px 0;
+    text-align: center;
+}
+
+.services-section h2 {
+    font-size: 2.5em;
+    margin-bottom: 40px;
+    position: relative;
+    padding-bottom: 15px;
+}
+.services-section h2::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 0;
+    width: 100px;
+    height: 4px;
+    background-color: #FFD700;
+    border-radius: 2px;
+}
+
+.service-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 30px;
+    margin-top: 30px;
+}
+
+.service-item {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.service-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+
+.service-item h3 {
+    font-size: 1.8em;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.service-item p {
+    color: #666;
+    margin-bottom: 15px;
+    font-size: 0.95em;
+}
+
+.service-item span {
+    display: block;
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #FFD700;
+}
+
+/* ==================================== */
+/* 7. Seção de Contato                  */
+/* ==================================== */
+.contact-section {
+    background-color: #222;
+    color: #fff;
+    padding: 60px 0;
+    text-align: center;
+}
+
+.contact-section h2 {
+    color: #FFD700;
+    font-size: 2.5em;
+    margin-bottom: 30px;
+}
+
+.contact-section p {
+    margin-bottom: 10px;
+    font-size: 1.1em;
+}
+
+.contact-section a {
+    color: #fff;
+    text-decoration: underline;
+}
+
+.map-container {
+    margin-top: 40px;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+.map-container iframe {
+    border-radius: 10px;
+}
+
+
+/* ==================================== */
+/* 8. Rodapé (Footer)                   */
+/* ==================================== */
+.footer {
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    padding: 20px 0;
+    font-size: 0.9em;
+}
+
+.footer .admin-link {
+    color: #FFD700;
+    font-weight: bold;
+    margin-left: 10px;
+    text-decoration: underline;
+}
+.footer .admin-link:hover {
+    color: #e6c200;
 }

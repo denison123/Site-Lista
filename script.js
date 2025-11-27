@@ -1,209 +1,386 @@
-// Array para armazenar os itens da lista
-let listaDeCompras = [];
+// ==========================================================
+// 1. CONFIGURAÇÃO E INICIALIZAÇÃO DO FIREBASE
+// ==========================================================
 
-// Seleciona elementos do DOM
-const formAdicionar = document.getElementById('form-adicionar');
-const tabelaItens = document.querySelector('#lista-itens tbody');
-const spanValorTotal = document.getElementById('valor-total');
+// **ATENÇÃO:** Substitua com a sua configuração REAL do Firebase!
+const firebaseConfig = {
+    apiKey: "AIzaSyD62PX1nxz7U5DCS_zEqc252_OcO7t-ixQ",
+    authDomain: "lista-75ae2.firebaseapp.com",
+    projectId: "lista-75ae2",
+    storageBucket: "lista-75ae2.firebasestorage.app",
+    messagingSenderId: "927677339472",
+    appId: "1:927677339472:web:1ca8ecf0db183f530f3e55",
+    measurementId: "G-HEF6G0TQBR"
+};
 
-// ====================================
-// FUNÇÕES DE PERSISTÊNCIA (localStorage)
-// ====================================
+// Inicializa o Firebase
+const app = firebase.initializeApp(firebaseConfig);
+const db = app.firestore(); // Acessa o Firestore
+const agendamentosRef = db.collection("agendamentos_barbearia"); // Coleção para agendamentos
 
-function salvarLista() {
-    // Converte o array JavaScript em uma string JSON para armazenamento
-    const listaJSON = JSON.stringify(listaDeCompras);
-    localStorage.setItem('supermercadoLista', listaJSON);
-}
+// ==========================================================
+// 2. ELEMENTOS DO DOM
+// ==========================================================
 
-function carregarLista() {
-    const listaJSON = localStorage.getItem('supermercadoLista');
-    if (listaJSON) {
-        listaDeCompras = JSON.parse(listaJSON);
-        // Garante que os campos de valor e quantidade sejam do tipo número
-        listaDeCompras.forEach(item => {
-            if (typeof item.valorUnitario === 'string') {
-                 item.valorUnitario = parseFloat(item.valorUnitario);
-            }
-            if (typeof item.quantidade === 'string') {
-                item.quantidade = parseInt(item.quantidade);
-            }
-        });
-    } 
-}
+const calendarGrid = document.getElementById('calendarGrid');
+const currentMonthYear = document.getElementById('currentMonthYear');
+const prevMonthBtn = document.getElementById('prevMonth');
+const nextMonthBtn = document.getElementById('nextMonth');
+const timeSlotsContainer = document.getElementById('timeSlots');
+const confirmBookingBtn = document.getElementById('confirmBooking');
+const selectedDateTimeSpan = document.getElementById('selectedDateTime');
 
-// ====================================
-// FUNÇÕES DE EDIÇÃO
-// ====================================
+// NOVOS ELEMENTOS DO FORMULÁRIO DE DETALHES
+const bookingDetailsDiv = document.getElementById('bookingDetails');
+const clientNameInput = document.getElementById('clientName');
+const clientContactInput = document.getElementById('clientContact'); // NOVO ELEMENTO
+const serviceSelect = document.getElementById('serviceSelect');
+const paymentMethodSelect = document.getElementById('paymentMethod');
+const totalPriceSpan = document.getElementById('totalPrice');
 
-function editarQuantidade(index, novoTexto) {
-    // 1. Limpa e converte para número inteiro
-    const quantidadeLimpa = novoTexto.trim().replace(',', '.');
-    let novaQuantidade = parseInt(quantidadeLimpa);
+// ==========================================================
+// 3. VARIÁVEIS DE ESTADO DO CALENDÁRIO/AGENDAMENTO
+// ==========================================================
 
-    // 2. Validação
-    if (isNaN(novaQuantidade) || novaQuantidade <= 0) {
-        alert('Quantidade inválida. Por favor, insira um número inteiro maior que zero.');
-        renderizarLista(); // Restaura o valor antigo
-        return;
-    }
+let currentDate = new Date(); // Data atual para navegação do calendário
+let selectedDate = null;     // Data selecionada pelo usuário
+let selectedTime = null;     // Horário selecionado pelo usuário
+let bookedAppointments = []; // Armazena agendamentos do Firebase para o dia selecionado
+
+const openingHour = 8;  // 08:00
+const closingHour = 22; // 22:00 (último agendamento possível é às 21:00 para terminar às 22:00)
+const serviceInterval = 1; // Intervalo de 1 hora entre os serviços
+
+// LISTA DE SERVIÇOS COM PREÇOS para lógica de cálculo
+const servicesList = {
+    "Corte Clássico": 40.00,
+    "Barba Tradicional": 35.00,
+    "Corte + Barba": 70.00,
+    "Acabamento": 20.00
+};
+
+// ==========================================================
+// 4. FUNÇÕES DO CALENDÁRIO
+// ==========================================================
+
+/**
+ * Renderiza o calendário para o mês e ano atuais.
+ */
+function renderCalendar() {
+    calendarGrid.innerHTML = ''; // Limpa o calendário existente
+
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth(); // 0-11 (Janeiro = 0)
     
-    // 3. Atualiza, salva e renderiza
-    listaDeCompras[index].quantidade = novaQuantidade;
-    salvarLista(); 
-    renderizarLista();
-}
+    currentMonthYear.textContent = new Date(year, month).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
 
-function editarValorUnitario(index, novoTexto) {
-    // 1. Limpa e converte para float
-    const valorLimpo = novoTexto.replace('R$', '').trim().replace(',', '.');
-    let novoValor = parseFloat(valorLimpo);
+    // Pega o dia da semana do 1º dia do mês (0=Dom, 6=Sáb)
+    const firstDayOfMonth = new Date(year, month, 1).getDay(); 
+    // Total de dias no mês
+    const daysInMonth = new Date(year, month + 1, 0).getDate(); 
 
-    // 2. Validação
-    if (isNaN(novoValor) || novoValor <= 0) {
-        alert('Valor inválido. Por favor, insira um número maior que zero.');
-        renderizarLista(); // Restaura o valor antigo
-        return;
-    }
-    
-    // Arredonda para duas casas decimais
-    novoValor = parseFloat(novoValor.toFixed(2));
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Zera hora para comparação de data
 
-    // 3. Atualiza, salva e renderiza
-    listaDeCompras[index].valorUnitario = novoValor;
-    salvarLista(); 
-    renderizarLista();
-}
-
-// ====================================
-// FUNÇÕES DE RENDERIZAÇÃO E CÁLCULO
-// ====================================
-
-function calcularTotal() {
-    const total = listaDeCompras.reduce((soma, item) => {
-        // Calcula apenas o total dos itens AINDA NÃO comprados
-        if (!item.comprado) {
-            return soma + (item.quantidade * item.valorUnitario); 
-        }
-        return soma;
-    }, 0); 
-    // Formata o valor para Real (R$)
-    spanValorTotal.textContent = `R$ ${total.toFixed(2).replace('.', ',')}`;
-}
-
-function renderizarLista() {
-    tabelaItens.innerHTML = ''; // Limpa a tabela
-
-    listaDeCompras.forEach((item, index) => {
-        const row = tabelaItens.insertRow();
-        if (item.comprado) {
-            row.classList.add('comprado');
-        }
-
-        // Célula 1: Comprado (Checkbox)
-        const cellComprado = row.insertCell();
-        cellComprado.setAttribute('data-label', 'Comprado');
-        const checkbox = document.createElement('input');
-        checkbox.type = 'checkbox';
-        checkbox.checked = item.comprado;
-        checkbox.addEventListener('change', () => toggleComprado(index)); 
-        cellComprado.appendChild(checkbox);
-
-        // Célula 2: Nome
-        const cellNome = row.insertCell();
-        cellNome.textContent = item.nome;
-        cellNome.setAttribute('data-label', 'Item');
-
-        // Célula 3: Quantidade (EDITÁVEL)
-        const cellQtd = row.insertCell();
-        cellQtd.setAttribute('data-label', 'Quantidade');
-        cellQtd.classList.add('cell-editable');
-        cellQtd.setAttribute('contenteditable', 'true');
-        cellQtd.textContent = `${item.quantidade}`;
-        // Listener de edição
-        cellQtd.addEventListener('blur', (e) => {
-             editarQuantidade(index, e.target.textContent);
-        });
-
-
-        // Célula 4: Valor Unitário (EDITÁVEL)
-        const cellVUnit = row.insertCell();
-        cellVUnit.setAttribute('data-label', 'Valor Unit. (R$)');
-        cellVUnit.classList.add('cell-editable');
-        cellVUnit.setAttribute('contenteditable', 'true');
-        cellVUnit.textContent = item.valorUnitario.toFixed(2).replace('.', ',');
-        // Listener de edição
-        cellVUnit.addEventListener('blur', (e) => {
-             editarValorUnitario(index, e.target.textContent);
-        });
-
-        // Célula 5: Valor Total (Calculado)
-        const cellVTotal = row.insertCell();
-        const valorTotalItem = item.quantidade * item.valorUnitario;
-        cellVTotal.textContent = valorTotalItem.toFixed(2).replace('.', ',');
-        cellVTotal.setAttribute('data-label', 'Total (R$)');
-
-        // Célula 6: Ações (Remover)
-        const cellAcoes = row.insertCell();
-        cellAcoes.setAttribute('data-label', 'Ações');
-        const btnRemover = document.createElement('button');
-        btnRemover.textContent = 'Remover';
-        btnRemover.addEventListener('click', () => removerItem(index)); 
-        cellAcoes.appendChild(btnRemover);
+    // Renderiza os nomes dos dias da semana
+    const dayNames = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+    dayNames.forEach(day => {
+        const dayNameDiv = document.createElement('div');
+        dayNameDiv.classList.add('day-name');
+        dayNameDiv.textContent = day;
+        calendarGrid.appendChild(dayNameDiv);
     });
 
-    calcularTotal();
+    // Renderiza células vazias antes do 1º dia do mês
+    for (let i = 0; i < firstDayOfMonth; i++) {
+        const emptyDiv = document.createElement('div');
+        emptyDiv.classList.add('empty');
+        calendarGrid.appendChild(emptyDiv);
+    }
+
+    // Renderiza os dias do mês
+    for (let day = 1; day <= daysInMonth; day++) {
+        const dayCell = document.createElement('div');
+        dayCell.classList.add('day-cell');
+        dayCell.textContent = day;
+
+        const currentDay = new Date(year, month, day);
+        currentDay.setHours(0, 0, 0, 0);
+
+        // Desabilita dias passados
+        if (currentDay < today) {
+            dayCell.classList.add('disabled');
+        } else {
+            // Adiciona evento de clique para selecionar a data
+            dayCell.addEventListener('click', () => selectDate(currentDay, dayCell));
+        }
+
+        // Marca o dia de hoje
+        if (currentDay.getTime() === today.getTime()) {
+            dayCell.classList.add('today');
+        }
+
+        // Marca a data selecionada (se houver e for o dia certo)
+        if (selectedDate && currentDay.getTime() === selectedDate.getTime()) {
+            dayCell.classList.add('selected');
+        }
+
+        calendarGrid.appendChild(dayCell);
+    }
+
+    // Se uma data já estiver selecionada e ela for do mês atualmente visível, 
+    // recarrega os horários. Caso contrário, reseta a exibição de horários.
+    if (selectedDate && selectedDate.getMonth() === month && selectedDate.getFullYear() === year) {
+        loadBookedAppointments(selectedDate);
+    } else {
+        timeSlotsContainer.innerHTML = '<p class="no-slots">Selecione uma data para ver os horários.</p>';
+        selectedDateTimeSpan.textContent = '';
+        bookingDetailsDiv.style.display = 'none'; // Esconde o formulário
+        confirmBookingBtn.disabled = true;
+    }
 }
 
-// ====================================
-// FUNÇÕES DE AÇÃO (Adicionar/Remover/Toggle)
-// ====================================
+/**
+ * Seleciona uma data no calendário.
+ * @param {Date} date - A data a ser selecionada.
+ * @param {HTMLElement} dayCellElement - O elemento DIV HTML da célula do dia clicada.
+ */
+function selectDate(date, dayCellElement) {
+    // Remove a classe 'selected' de qualquer célula previamente selecionada
+    const prevSelected = document.querySelector('.day-cell.selected');
+    if (prevSelected) {
+        prevSelected.classList.remove('selected');
+    }
 
-function adicionarItem(e) {
-    e.preventDefault(); 
-    const nome = document.getElementById('item-nome').value.trim();
-    const quantidade = parseInt(document.getElementById('item-quantidade').value);
-    const valor = parseFloat(document.getElementById('item-valor').value);
+    selectedDate = date; // Atualiza a variável de estado
+    dayCellElement.classList.add('selected'); // Adiciona a classe 'selected' ao elemento clicado
 
-    // Validação básica para evitar adicionar itens vazios
-    if (!nome || isNaN(quantidade) || isNaN(valor) || quantidade <= 0 || valor <= 0) {
-        alert("Por favor, preencha todos os campos com valores válidos.");
+    selectedTime = null; // Reseta o horário ao mudar a data
+    selectedDateTimeSpan.textContent = `Data selecionada: ${selectedDate.toLocaleDateString('pt-BR')}`;
+    
+    bookingDetailsDiv.style.display = 'none'; // Esconde o formulário de detalhes ao mudar a data
+    confirmBookingBtn.disabled = true; // Desabilita botão até um horário ser escolhido
+
+    loadBookedAppointments(selectedDate); // Carrega agendamentos para a nova data
+}
+
+// ==========================================================
+// 5. FUNÇÕES DE HORÁRIOS
+// ==========================================================
+
+/**
+ * Gera e exibe os horários disponíveis para a data selecionada.
+ * @param {Array} bookedTimes - Array de strings de horários já agendados para a data.
+ */
+function generateTimeSlots(bookedTimes) {
+    timeSlotsContainer.innerHTML = '';
+    let hasAvailableSlots = false;
+    const now = new Date(); // Para comparar com a hora atual
+
+    for (let hour = openingHour; hour < closingHour; hour += serviceInterval) {
+        const time = `${String(hour).padStart(2, '0')}:00`; // Formato "HH:00"
+        const timeSlotDiv = document.createElement('div');
+        timeSlotDiv.classList.add('time-slot');
+        timeSlotDiv.textContent = time;
+
+        const currentSlotDateTime = new Date(selectedDate);
+        currentSlotDateTime.setHours(hour, 0, 0, 0); // Define a hora para comparação
+
+        const isBooked = bookedTimes.includes(time);
+        const isPast = (currentSlotDateTime < now); // Verifica se o horário já passou
+
+        if (isBooked) {
+            timeSlotDiv.classList.add('booked');
+        } else if (isPast) {
+            // Se a data selecionada é hoje e o horário já passou
+            timeSlotDiv.classList.add('disabled'); 
+            timeSlotDiv.style.cursor = 'not-allowed';
+            timeSlotDiv.style.opacity = '0.6';
+        } else {
+            // Horário disponível
+            timeSlotDiv.addEventListener('click', () => selectTime(timeSlotDiv, time));
+            hasAvailableSlots = true;
+        }
+        timeSlotsContainer.appendChild(timeSlotDiv);
+    }
+
+    // Mensagens caso não haja slots
+    if (!hasAvailableSlots && bookedTimes.length > 0) {
+        timeSlotsContainer.innerHTML = '<p class="no-slots">Todos os horários estão agendados para este dia.</p>';
+    } else if (!hasAvailableSlots && bookedTimes.length === 0) {
+        // Isso pode acontecer se todos os horários são no passado para o dia selecionado
+        timeSlotsContainer.innerHTML = '<p class="no-slots">Não há horários disponíveis para agendamento neste dia.</p>';
+    }
+}
+
+/**
+ * Seleciona um horário disponível.
+ * @param {HTMLElement} element - O elemento HTML do horário clicado.
+ * @param {string} time - O horário selecionado (ex: "09:00").
+ */
+function selectTime(element, time) {
+    // Remove a classe 'selected' de qualquer horário previamente selecionado
+    const prevSelected = document.querySelector('.time-slot.selected');
+    if (prevSelected) {
+        prevSelected.classList.remove('selected');
+    }
+
+    selectedTime = time; // Atualiza a variável de estado
+    element.classList.add('selected'); // Adiciona a classe 'selected' ao elemento clicado
+
+    selectedDateTimeSpan.textContent = `Horário selecionado: ${selectedDate.toLocaleDateString('pt-BR')} às ${selectedTime}`;
+    
+    // EXIBE O FORMULÁRIO DE DETALHES E ATUALIZA O ESTADO DO BOTÃO
+    bookingDetailsDiv.style.display = 'block'; 
+    updateConfirmationState(); // Verifica o estado inicial dos campos do formulário
+}
+
+// ==========================================================
+// 6. FUNÇÕES AUXILIARES DO FORMULÁRIO
+// ==========================================================
+
+/**
+ * Calcula o preço total e atualiza o estado do botão de confirmação.
+ * Habilita o botão apenas se todos os campos obrigatórios estiverem preenchidos.
+ */
+function updateConfirmationState() {
+    const clientName = clientNameInput.value.trim();
+    const clientContact = clientContactInput.value.trim(); // NOVO: Captura o valor do contato
+    const selectedService = serviceSelect.value;
+    const paymentMethod = paymentMethodSelect.value;
+
+    // 1. Calcula e exibe o preço
+    const price = servicesList[selectedService] || 0; // Pega o preço do serviço selecionado
+    totalPriceSpan.textContent = `R$ ${price.toFixed(2).replace('.', ',')}`;
+
+    // 2. Habilita/Desabilita o botão de confirmação
+    // NOVO: clientContact.length > 8 (um mínimo razoável para um telefone, ajuste se preferir outro)
+    const isValid = selectedService !== "" && paymentMethod !== "" && clientName.length > 2 && clientContact.length > 8; 
+
+    confirmBookingBtn.disabled = !isValid;
+}
+
+
+// ==========================================================
+// 7. FUNÇÕES DE AGENDAMENTO (Firebase Interaction)
+// ==========================================================
+
+/**
+ * Carrega os agendamentos já existentes para a data selecionada do Firebase.
+ * @param {Date} date - A data para verificar agendamentos.
+ */
+async function loadBookedAppointments(date) {
+    if (!date) {
+        timeSlotsContainer.innerHTML = '<p class="no-slots">Selecione uma data para ver os horários.</p>';
         return;
     }
 
-    const novoItem = {
-        nome: nome,
-        quantidade: quantidade,
-        valorUnitario: valor,
-        comprado: false
+    const dateString = date.toISOString().split('T')[0]; // Formato "YYYY-MM-DD"
+
+    // Consulta os agendamentos no Firestore para a data específica
+    try {
+        const snapshot = await agendamentosRef.where('date', '==', dateString).get();
+        // Extrai apenas os horários dos documentos encontrados
+        bookedAppointments = snapshot.docs.map(doc => doc.data().time); 
+        generateTimeSlots(bookedAppointments); // Gera os horários com base nos agendados
+    } catch (error) {
+        console.error("Erro ao carregar agendamentos: ", error);
+        alert("Não foi possível carregar os horários. Por favor, tente novamente.");
+        timeSlotsContainer.innerHTML = '<p class="no-slots">Erro ao carregar horários.</p>';
+    }
+}
+
+/**
+ * Confirma e salva o agendamento no Firebase.
+ */
+async function confirmBooking() {
+    const clientName = clientNameInput.value.trim();
+    const clientContact = clientContactInput.value.trim(); // NOVO: Captura o valor do contato
+    const selectedService = serviceSelect.value;
+    const paymentMethod = paymentMethodSelect.value;
+    const totalPrice = servicesList[selectedService]; // Pega o preço real do serviço
+
+    // NOVO: Adiciona clientContact à validação inicial
+    if (!selectedDate || !selectedTime || !clientName || !clientContact || !selectedService || !paymentMethod) {
+        alert("Por favor, preencha todos os campos (Data, Hora, Nome, Contato, Serviço e Pagamento).");
+        return;
+    }
+
+    const dateString = selectedDate.toISOString().split('T')[0]; // "YYYY-MM-DD"
+    
+    // Objeto de agendamento com todos os detalhes (incluindo contato)
+    const newAppointment = {
+        date: dateString,
+        time: selectedTime,
+        clientName: clientName,          
+        clientContact: clientContact,    // NOVO: Inclui o contato no objeto
+        service: selectedService,        
+        paymentMethod: paymentMethod,    
+        price: totalPrice,               
+        timestamp: firebase.firestore.FieldValue.serverTimestamp() 
     };
 
-    listaDeCompras.push(novoItem);
-    salvarLista(); 
-    renderizarLista();
-    formAdicionar.reset();
+    // Verificação dupla para evitar agendamentos simultâneos (race condition)
+    try {
+        const existingAppointments = await agendamentosRef
+            .where('date', '==', dateString)
+            .where('time', '==', selectedTime)
+            .get();
+
+        if (!existingAppointments.empty) {
+            alert("Este horário já foi agendado por outra pessoa. Por favor, escolha outro.");
+            await loadBookedAppointments(selectedDate); // Recarrega os horários para refletir a mudança
+            return;
+        }
+
+        await agendamentosRef.add(newAppointment);
+        alert(`Agendamento de ${clientName} (${clientContact}) para ${selectedService} confirmado para ${selectedDate.toLocaleDateString('pt-BR')} às ${selectedTime}!\nValor Total: R$ ${totalPrice.toFixed(2).replace('.', ',')}\nForma de Pagamento: ${paymentMethod}`);
+        
+        // --- RESETANDO O ESTADO APÓS AGENDAMENTO ---
+        await loadBookedAppointments(selectedDate); // Recarrega os horários para mostrar o novo agendamento como indisponível
+        
+        selectedTime = null; // Limpa seleção de horário
+        selectedDateTimeSpan.textContent = '';
+        bookingDetailsDiv.style.display = 'none'; // Esconde o formulário de detalhes
+        clientNameInput.value = '';             // Limpa o nome
+        clientContactInput.value = '';          // NOVO: Limpa o campo de contato
+        serviceSelect.value = '';               // Reseta o serviço para a opção "Selecione..."
+        paymentMethodSelect.value = '';         // Reseta o pagamento para a opção "Selecione..."
+        totalPriceSpan.textContent = 'R$ 0,00'; // Reseta o total
+        confirmBookingBtn.disabled = true;      // Desabilita o botão de confirmação
+
+    } catch (error) {
+        console.error("Erro ao confirmar agendamento: ", error);
+        alert("Ocorreu um erro ao confirmar seu agendamento. Por favor, tente novamente.");
+    }
 }
 
-function removerItem(index) {
-    listaDeCompras.splice(index, 1);
-    salvarLista(); 
-    renderizarLista();
-}
+// ==========================================================
+// 8. LISTENERS DE EVENTOS
+// ==========================================================
 
-function toggleComprado(index) {
-    listaDeCompras[index].comprado = !listaDeCompras[index].comprado;
-    salvarLista(); 
-    renderizarLista();
-}
+// Listeners para navegação do calendário
+prevMonthBtn.addEventListener('click', () => {
+    currentDate.setMonth(currentDate.getMonth() - 1);
+    renderCalendar();
+});
 
-// ====================================
-// INICIALIZAÇÃO DA APLICAÇÃO
-// ====================================
+nextMonthBtn.addEventListener('click', () => {
+    currentDate.setMonth(currentDate.getMonth() + 1);
+    renderCalendar();
+});
 
-// Escutador de Evento para Adicionar
-formAdicionar.addEventListener('submit', adicionarItem);
+// Listener para o botão de confirmação de agendamento
+confirmBookingBtn.addEventListener('click', confirmBooking);
 
-// 1. Carrega os dados salvos
-carregarLista();
-// 2. Desenha a lista na tela
-renderizarLista();
+// LISTENERS PARA OS CAMPOS DO NOVO FORMULÁRIO DE DETALHES
+clientNameInput.addEventListener('input', updateConfirmationState);
+clientContactInput.addEventListener('input', updateConfirmationState); // NOVO LISTENER
+serviceSelect.addEventListener('change', updateConfirmationState);
+paymentMethodSelect.addEventListener('change', updateConfirmationState);
+
+// ==========================================================
+// 9. INICIALIZAÇÃO
+// ==========================================================
+// Renderiza o calendário ao carregar a página pela primeira vez
+renderCalendar();

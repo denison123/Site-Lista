@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Barbearia 115 - Área do Barbeiro</title>
+    <link rel="stylesheet" href="admin.css">
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;700&family=Roboto+Slab:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body class="admin-body">
+    <header class="header">
+        <div class="container">
+            <img src="barbearia115-logo.png" alt="Barbearia 115 Logo" class="logo">
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="index.html">Agendamento Cliente</a></li>
+                    <li><a href="#" id="logoutBtn">Sair</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main-content container admin-content">
+        <section class="admin-login-section" id="adminLogin" style="display: block;">
+            <h2>Acesso Restrito - Barbeiro</h2>
+            <div class="login-form">
+                <label for="adminEmail">E-mail:</label>
+                <input type="email" id="adminEmail" placeholder="seu@email.com" required>
+
+                <label for="adminPassword">Senha:</label>
+                <input type="password" id="adminPassword" placeholder="Sua senha" required>
+
+                <button id="loginBtn" class="confirm-button">Entrar</button>
+                <p id="loginError" class="error-message"></p>
+            </div>
+        </section>
+
+        <section class="admin-dashboard-section" id="adminDashboard" style="display: none;">
+            <h2>Agendamentos de Hoje</h2>
+            <div class="dashboard-controls">
+                <button id="prevDayBtn" class="nav-button">&lt; Anterior</button>
+                <h3 id="currentAdminDate">Data Atual</h3>
+                <button id="nextDayBtn" class="nav-button">Próximo &gt;</button>
+            </div>
+            
+            <div id="appointmentsList" class="appointments-list">
+                <p class="no-appointments">Nenhum agendamento para esta data.</p>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>© 2023 Barbearia 115. Área Administrativa.</p>
+        </div>
+    </footer>
+
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+    
+    <script src="admin.js"></script>
+</body>
+</html>
