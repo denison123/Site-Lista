@@ -1,8 +1,10 @@
+
 // ==========================================================
 // 1. CONFIGURAÇÃO E INICIALIZAÇÃO DO FIREBASE (Admin)
 // ==========================================================
 
 // **ATENÇÃO:** Substitua com a sua configuração REAL do Firebase!
+
 const firebaseConfig = {
     apiKey: "AIzaSyD62PX1nxz7U5DCS_zEqc252_OcO7t-ixQ",
     authDomain: "lista-75ae2.firebaseapp.com",
@@ -43,6 +45,23 @@ const currentAdminDate = document.getElementById('currentAdminDate');
 // ==========================================================
 let displayDate = new Date(); // Data que está sendo exibida no dashboard
 
+// Função para configurar o botão de Sair
+function setupLogout() {
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', (e) => {
+            e.preventDefault(); // Impede o comportamento padrão do link
+            
+            // Chama a função de sair do Firebase
+            firebase.auth().signOut().then(() => {
+                console.log("Usuário deslogado com sucesso.");
+                // O listener de autenticação (onAuthStateChanged) abaixo fará o resto
+            }).catch((error) => {
+                console.error("Erro ao deslogar:", error);
+                alert("Erro ao sair. Tente novamente.");
+            });
+        });
+    }
+}
 // ==========================================================
 // 4. FUNÇÕES DE AUTENTICAÇÃO
 // ==========================================================
