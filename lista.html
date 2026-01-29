@@ -4,43 +4,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Supermercado Inteligente</title>
+    <title>DRL_TECNOLOGIA</title>
     <link rel="stylesheet" href="style.css">
-    <style>
-
-    </style>
 </head>
 
 <body>
 
     <div class="container">
-        <h2>🛒 Lista de Compras Inteligente 🛒</h2>
+        <h2>🛒 LISTA DE SUPERMERCADO 🛒</h2>
         <div class="controles">
-            <input type="text" id="pesquisa" placeholder="🔍 Pesquisar produto..." onkeyup="filtrar()">
-            <button class="btn-add" onclick="adicionarLinha()">+ Novo Item</button>
+            <input type="text" id="pesquisa" placeholder="Buscar na lista..." onkeyup="filtrar()">
+            <button class="btn-add" onclick="adicionarLinha()">+ Adicionar</button>
         </div>
-
         <table id="tabelaCompras">
             <thead>
                 <tr>
                     <th style="width: 40px;">✔</th>
                     <th>Item</th>
-                    <th style="width: 80px;">Qtd</th>
-                    <th style="width: 110px;">Preço (R$)</th>
-                    <th style="width: 100px;">Total</th>
+                    <th style="width: 70px;">Qtd</th>
+                    <th style="width: 100px;">Preço (R$)</th>
+                    <th style="width: 100px;">Subtotal</th>
+                    <th style="width: 30px;"></th>
                 </tr>
             </thead>
             <tbody id="corpoTabela"></tbody>
         </table>
-
         <div class="total-box">
-            Total Geral: R$ <span id="valorTotalGeral">0,00</span>
+            <span style="display:block; color:var(--primary)">VALOR TOTAL DA COMPRA:</span>
+            <span class="total-valor">R$ <span id="valorTotalGeral">0,00</span></span>
         </div>
-
-        <div style="margin-top: 20px; display: flex; justify-content: space-between; align-items: center;">
-            <button class="btn-limpar" onclick="limparTabela()">🧹 Limpar Tudo</button>
-            <small style="color: #888;">* Salva automaticamente no navegador.</small>
-        </div>
+        <button class="btn-limpar" onclick="limparTabela()">🧹 Limpar Toda a Lista</button>
     </div>
 
     <script>
@@ -51,97 +44,92 @@
             const novaLinha = document.createElement("tr");
             if (pego) novaLinha.classList.add("item-pego");
 
-            // Usei "text" para o preço para aceitar a vírgula BR mais facilmente
             novaLinha.innerHTML = `
-            <td style="text-align: center;"><input type="checkbox" ${pego ? 'checked' : ''} onclick="marcarItem(this)"></td>
-            <td><input type="text" placeholder="Nome..." value="${nome}" oninput="salvarDados()"></td>
-            <td><input type="number" value="${qtd}" min="1" oninput="calcular()"></td>
-            <td><input type="text" value="${valor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}" oninput="calcular()" placeholder="0,00"></td>
-            <td class="totalItem" style="font-weight: bold;">0,00</td>
+            <td data-label="Pego?"><input type="checkbox" class="chk-pego" ${pego ? 'checked' : ''} onclick="marcarItem(this)"></td>
+            <td data-label="Item"><input type="text" class="nome-item" placeholder="Ex: Café" value="${nome}" oninput="salvarDados()"></td>
+            <td data-label="Qtd"><input type="number" class="qtd-item" value="${qtd}" min="1" oninput="calcular()"></td>
+            <td data-label="Preço"><input type="text" class="preco-item" value="${valor > 0 ? formatarMoeda(valor) : ''}" oninput="calcular()" placeholder="0,00"></td>
+            <td data-label="Subtotal" class="subtotal-item" style="font-weight: bold; text-align:right">0,00</td>
+            <td><button class="btn-del" onclick="removerLinha(this)">🗑</button></td>
         `;
-
             tabela.insertBefore(novaLinha, tabela.firstChild);
             calcular();
         }
 
         function marcarItem(checkbox) {
-            const linha = checkbox.parentElement.parentElement;
+            const linha = checkbox.closest("tr");
             checkbox.checked ? linha.classList.add("item-pego") : linha.classList.remove("item-pego");
             salvarDados();
+        }
+
+        function removerLinha(btn) {
+            btn.closest("tr").remove();
+            calcular();
+        }
+
+        function converterParaNumero(valorString) {
+            if (!valorString) return 0;
+            let limpo = valorString.replace(/\./g, '').replace(',', '.');
+            return parseFloat(limpo) || 0;
         }
 
         function formatarMoeda(valor) {
             return valor.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         }
 
-        function converterParaNumero(valorString) {
-            // Remove pontos de milhar e troca vírgula por ponto para o JS calcular
-            let limpo = valorString.replace(/\./g, '').replace(',', '.');
-            return parseFloat(limpo) || 0;
-        }
-
         function calcular() {
-            let totalGeral = 0;
+            let somaTotal = 0;
             const linhas = document.querySelectorAll("#corpoTabela tr");
 
             linhas.forEach(linha => {
-                const inputs = linha.querySelectorAll("input");
-                const qtd = parseFloat(inputs[2].value) || 0;
-                const valorUnitario = converterParaNumero(inputs[3].value);
+                const qtd = parseFloat(linha.querySelector(".qtd-item").value) || 0;
+                const preco = converterParaNumero(linha.querySelector(".preco-item").value);
+                const subtotal = qtd * preco;
 
-                const totalItem = qtd * valorUnitario;
-
-                linha.querySelector(".totalItem").innerText = formatarMoeda(totalItem);
-                totalGeral += totalItem;
+                linha.querySelector(".subtotal-item").innerText = formatarMoeda(subtotal);
+                somaTotal += subtotal; // Agora soma tudo, independente do checkbox
             });
 
-            document.getElementById("valorTotalGeral").innerText = formatarMoeda(totalGeral);
+            document.getElementById("valorTotalGeral").innerText = formatarMoeda(somaTotal);
             salvarDados();
         }
 
         function filtrar() {
             const busca = document.getElementById("pesquisa").value.toLowerCase();
-            const linhas = document.querySelectorAll("#corpoTabela tr");
-            linhas.forEach(linha => {
-                const nomeItem = linha.querySelector("input[type='text']").value.toLowerCase();
-                linha.style.display = nomeItem.includes(busca) ? "" : "none";
+            document.querySelectorAll("#corpoTabela tr").forEach(linha => {
+                const nome = linha.querySelector(".nome-item").value.toLowerCase();
+                linha.style.display = nome.includes(busca) ? "" : "none";
             });
         }
 
         function salvarDados() {
             const dados = [];
-            const linhas = document.querySelectorAll("#corpoTabela tr");
-            linhas.forEach(linha => {
-                const inputs = linha.querySelectorAll("input");
+            document.querySelectorAll("#corpoTabela tr").forEach(linha => {
                 dados.push({
-                    pego: inputs[0].checked,
-                    nome: inputs[1].value,
-                    qtd: inputs[2].value,
-                    valor: converterParaNumero(inputs[3].value)
+                    pego: linha.querySelector(".chk-pego").checked,
+                    nome: linha.querySelector(".nome-item").value,
+                    qtd: linha.querySelector(".qtd-item").value,
+                    valor: converterParaNumero(linha.querySelector(".preco-item").value)
                 });
             });
-            localStorage.setItem("listaCompras", JSON.stringify(dados.reverse()));
+            localStorage.setItem("listaCompras_V3", JSON.stringify(dados));
         }
 
         function carregarDados() {
-            const salvo = localStorage.getItem("listaCompras");
+            const salvo = localStorage.getItem("listaCompras_V3");
             if (salvo) {
                 const dados = JSON.parse(salvo);
                 document.getElementById("corpoTabela").innerHTML = "";
-                dados.forEach(item => {
-                    adicionarLinha(item.nome, item.qtd, item.valor, item.pego);
-                });
+                dados.reverse().forEach(item => adicionarLinha(item.nome, item.qtd, item.valor, item.pego));
             } else {
                 adicionarLinha();
             }
         }
 
         function limparTabela() {
-            if (confirm("Apagar toda a lista?")) {
-                localStorage.removeItem("listaCompras");
-                document.getElementById("corpoTabela").innerHTML = "";
-                document.getElementById("valorTotalGeral").innerText = "0,00";
-                adicionarLinha();
+            if (confirm("Limpar toda a lista?")) {
+                localStorage.removeItem("listaCompras_V3");
+                location.reload();
             }
         }
     </script>
