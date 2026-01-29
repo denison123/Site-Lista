@@ -1,0 +1,96 @@
+body {
+    font-family: 'Segoe UI', sans-serif;
+    padding: 20px;
+    background: #f0f2f5;
+}
+
+.container {
+    max-width: 800px;
+    margin: auto;
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+h2 {
+    text-align: center;
+    color: #2e7d32;
+}
+
+.controles {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+#pesquisa {
+    flex-grow: 1;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th,
+td {
+    border-bottom: 1px solid #eee;
+    padding: 12px;
+    text-align: left;
+}
+
+th {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.item-pego {
+    background-color: #f1f8e9;
+    opacity: 0.7;
+}
+
+.item-pego input[type="text"] {
+    text-decoration: line-through;
+}
+
+input[type="number"],
+input[type="text"] {
+    width: 90%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.btn-add {
+    background: #4CAF50;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    cursor: pointer;
+    border-radius: 8px;
+    font-weight: bold;
+}
+
+.btn-limpar {
+    background: #ff5252;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    cursor: pointer;
+    border-radius: 8px;
+    font-weight: bold;
+}
+
+.total-box {
+    margin-top: 20px;
+    padding: 15px;
+    background: #e8f5e9;
+    border-radius: 8px;
+    text-align: right;
+    font-size: 1.3em;
+    font-weight: bold;
+}
