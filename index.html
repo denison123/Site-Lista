@@ -1,138 +1,150 @@
 <!DOCTYPE html>
 <html lang="pt-br">
-
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DRL_TECNOLOGIA</title>
-    <link rel="stylesheet" href="style.css">
-</head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Supermercado Pro Cloud</title>
+    <style>
+        :root { --primary: #2e7d32; --secondary: #4CAF50; --danger: #ff5252; --bg: #f0f2f5; }
+        body { font-family: 'Segoe UI', sans-serif; padding: 10px; background: var(--bg); margin: 0; }
+        .container { max-width: 900px; margin: auto; background: white; padding: 15px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .controles { display: flex; gap: 10px; margin-bottom: 20px; }
+        #pesquisa { flex: 1; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 16px; min-width: 0; }
+        .btn-add { background: var(--secondary); color: white; border: none; padding: 12px 15px; cursor: pointer; border-radius: 8px; font-weight: bold; white-space: nowrap; }
+        table { width: 100%; border-collapse: collapse; }
+        th { background-color: var(--secondary); color: white; padding: 12px; text-align: left; }
+        td { border-bottom: 1px solid #eee; padding: 10px; }
+        input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; font-size: 16px; }
+        .item-pego { background-color: #f1f8e9; opacity: 0.8; }
+        .item-pego .nome-item { text-decoration: line-through; color: #888; }
+        .total-box { margin-top: 20px; padding: 15px; background: #e8f5e9; border-radius: 8px; text-align: right; border: 2px solid var(--secondary); }
+        .total-valor { font-size: 1.8em; font-weight: bold; color: #1b5e20; }
+        .btn-limpar { background: var(--danger); color: white; border: none; padding: 15px; cursor: pointer; border-radius: 8px; font-weight: bold; width: 100%; margin-top: 15px; }
 
+        @media screen and (max-width: 600px) {
+            thead { display: none; }
+            tr { display: block; margin-bottom: 15px; border: 2px solid #eee; border-radius: 10px; padding: 10px; background: #fff; }
+            td { display: flex; justify-content: space-between; align-items: center; border: none; padding: 8px 0; }
+            td::before { content: attr(data-label); font-weight: bold; color: var(--primary); flex: 1; text-align: left; }
+            td input { width: 60% !important; text-align: right; }
+        }
+    </style>
+</head>
 <body>
 
-    <div class="container">
-        <h2>🛒 LISTA DE SUPERMERCADO 🛒</h2>
-        <div class="controles">
-            <input type="text" id="pesquisa" placeholder="Buscar na lista..." onkeyup="filtrar()">
-            <button class="btn-add" onclick="adicionarLinha()">+ Adicionar</button>
-        </div>
-        <table id="tabelaCompras">
-            <thead>
-                <tr>
-                    <th style="width: 40px;">✔</th>
-                    <th>Item</th>
-                    <th style="width: 70px;">Qtd</th>
-                    <th style="width: 100px;">Preço (R$)</th>
-                    <th style="width: 100px;">Subtotal</th>
-                    <th style="width: 30px;"></th>
-                </tr>
-            </thead>
-            <tbody id="corpoTabela"></tbody>
-        </table>
-        <div class="total-box">
-            <span style="display:block; color:var(--primary)">VALOR TOTAL DA COMPRA:</span>
-            <span class="total-valor">R$ <span id="valorTotalGeral">0,00</span></span>
-        </div>
-        <button class="btn-limpar" onclick="limparTabela()">🧹 Limpar Toda a Lista</button>
+<div class="container">
+    <h2 style="text-align:center; color:var(--primary)">🛒 Lista Compartilhada</h2>
+    <div class="controles">
+        <input type="text" id="pesquisa" placeholder="🔍 Buscar..." onkeyup="filtrar()">
+        <button class="btn-add" onclick="adicionarItem()">+ Item</button>
     </div>
+    <table id="tabelaCompras">
+        <thead>
+            <tr><th>✔</th><th>Item</th><th>Qtd</th><th>Preço</th><th>Subtotal</th><th></th></tr>
+        </thead>
+        <tbody id="corpoTabela"></tbody>
+    </table>
+    <div class="total-box">
+        <small>TOTAL DA COMPRA</small>
+        <span class="total-valor">R$ <span id="valorTotalGeral">0,00</span></span>
+    </div>
+    <button class="btn-limpar" onclick="limparTudo()">🧹 Limpar Nuvem</button>
+</div>
 
-    <script>
-        window.onload = carregarDados;
+<script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore-compat.js"></script>
 
-        function adicionarLinha(nome = "", qtd = 1, valor = 0, pego = false) {
-            const tabela = document.getElementById("corpoTabela");
-            const novaLinha = document.createElement("tr");
-            if (pego) novaLinha.classList.add("item-pego");
+<script>
+    // Configurações do seu projeto
+    const firebaseConfig = {
+        apiKey: "AIzaSyC7pFhR4SMJjss3UxxS0R7_-5j0mMaFKlY",
+        authDomain: "lista-de-compras-8bb97.firebaseapp.com",
+        projectId: "lista-de-compras-8bb97",
+        storageBucket: "lista-de-compras-8bb97.firebasestorage.app",
+        messagingSenderId: "1068067896372",
+        appId: "1:1068067896372:web:31e34b15b7e314d6671e61",
+        measurementId: "G-LSHLD29S3F"
+    };
 
-            novaLinha.innerHTML = `
-            <td data-label="Pego?"><input type="checkbox" class="chk-pego" ${pego ? 'checked' : ''} onclick="marcarItem(this)"></td>
-            <td data-label="Item"><input type="text" class="nome-item" placeholder="Ex: Café" value="${nome}" oninput="salvarDados()"></td>
-            <td data-label="Qtd"><input type="number" class="qtd-item" value="${qtd}" min="1" oninput="calcular()"></td>
-            <td data-label="Preço"><input type="text" class="preco-item" value="${valor > 0 ? formatarMoeda(valor) : ''}" oninput="calcular()" placeholder="0,00"></td>
-            <td data-label="Subtotal" class="subtotal-item" style="font-weight: bold; text-align:right">0,00</td>
-            <td><button class="btn-del" onclick="removerLinha(this)">🗑</button></td>
-        `;
-            tabela.insertBefore(novaLinha, tabela.firstChild);
-            calcular();
-        }
+    // Inicializa o Firebase
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
 
-        function marcarItem(checkbox) {
-            const linha = checkbox.closest("tr");
-            checkbox.checked ? linha.classList.add("item-pego") : linha.classList.remove("item-pego");
-            salvarDados();
-        }
+    // Sincronização em tempo real com o Firestore
+    db.collection("lista").orderBy("timestamp", "desc").onSnapshot((snapshot) => {
+        const itens = [];
+        snapshot.forEach((doc) => itens.push({ id: doc.id, ...doc.data() }));
+        renderizar(itens);
+    }, (error) => {
+        console.error("Erro ao ler dados: ", error);
+    });
 
-        function removerLinha(btn) {
-            btn.closest("tr").remove();
-            calcular();
-        }
+    function renderizar(itens) {
+        const corpo = document.getElementById("corpoTabela");
+        corpo.innerHTML = "";
+        let total = 0;
 
-        function converterParaNumero(valorString) {
-            if (!valorString) return 0;
-            let limpo = valorString.replace(/\./g, '').replace(',', '.');
-            return parseFloat(limpo) || 0;
-        }
+        itens.forEach(item => {
+            const sub = (item.qtd || 0) * (item.valor || 0);
+            total += sub;
+            const tr = document.createElement("tr");
+            if(item.pego) tr.classList.add("item-pego");
+            
+            tr.innerHTML = `
+                <td data-label="Pego?"><input type="checkbox" ${item.pego ? 'checked' : ''} onclick="update('${item.id}', {pego: this.checked})"></td>
+                <td data-label="Item"><input type="text" class="nome-item" value="${item.nome}" onchange="update('${item.id}', {nome: this.value})"></td>
+                <td data-label="Qtd"><input type="number" value="${item.qtd}" onchange="update('${item.id}', {qtd: Number(this.value)})"></td>
+                <td data-label="Preço"><input type="text" value="${item.valor.toLocaleString('pt-BR', {minimumFractionDigits:2})}" onchange="updatePreco('${item.id}', this.value)"></td>
+                <td data-label="Subtotal" style="font-weight:bold">R$ ${sub.toLocaleString('pt-BR', {minimumFractionDigits:2})}</td>
+                <td><button style="border:none; background:none; color:red; cursor:pointer" onclick="remover('${item.id}')">🗑</button></td>
+            `;
+            corpo.appendChild(tr);
+        });
+        document.getElementById("valorTotalGeral").innerText = total.toLocaleString('pt-BR', {minimumFractionDigits:2});
+    }
 
-        function formatarMoeda(valor) {
-            return valor.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-        }
-
-        function calcular() {
-            let somaTotal = 0;
-            const linhas = document.querySelectorAll("#corpoTabela tr");
-
-            linhas.forEach(linha => {
-                const qtd = parseFloat(linha.querySelector(".qtd-item").value) || 0;
-                const preco = converterParaNumero(linha.querySelector(".preco-item").value);
-                const subtotal = qtd * preco;
-
-                linha.querySelector(".subtotal-item").innerText = formatarMoeda(subtotal);
-                somaTotal += subtotal; // Agora soma tudo, independente do checkbox
+    async function adicionarItem() {
+        try {
+            await db.collection("lista").add({
+                nome: "", qtd: 1, valor: 0, pego: false, timestamp: Date.now()
             });
-
-            document.getElementById("valorTotalGeral").innerText = formatarMoeda(somaTotal);
-            salvarDados();
+        } catch (e) {
+            alert("Erro ao salvar! Verifique se as Regras do Banco estão em modo de teste.");
         }
+    }
 
-        function filtrar() {
-            const busca = document.getElementById("pesquisa").value.toLowerCase();
-            document.querySelectorAll("#corpoTabela tr").forEach(linha => {
-                const nome = linha.querySelector(".nome-item").value.toLowerCase();
-                linha.style.display = nome.includes(busca) ? "" : "none";
-            });
+    async function update(id, dados) {
+        await db.collection("lista").doc(id).update(dados);
+    }
+
+    async function updatePreco(id, valStr) {
+        const val = parseFloat(valStr.replace(/\./g, '').replace(',', '.')) || 0;
+        await update(id, { valor: val });
+    }
+
+    async function remover(id) {
+        if(confirm("Remover este item?")) await db.collection("lista").doc(id).delete();
+    }
+
+    async function limparTudo() {
+        if(confirm("Isso apagará a lista para TODOS os dispositivos. Confirmar?")) {
+            const docs = await db.collection("lista").get();
+            const batch = db.batch();
+            docs.forEach(d => batch.delete(d.ref));
+            await batch.commit();
         }
+    }
 
-        function salvarDados() {
-            const dados = [];
-            document.querySelectorAll("#corpoTabela tr").forEach(linha => {
-                dados.push({
-                    pego: linha.querySelector(".chk-pego").checked,
-                    nome: linha.querySelector(".nome-item").value,
-                    qtd: linha.querySelector(".qtd-item").value,
-                    valor: converterParaNumero(linha.querySelector(".preco-item").value)
-                });
-            });
-            localStorage.setItem("listaCompras_V3", JSON.stringify(dados));
-        }
-
-        function carregarDados() {
-            const salvo = localStorage.getItem("listaCompras_V3");
-            if (salvo) {
-                const dados = JSON.parse(salvo);
-                document.getElementById("corpoTabela").innerHTML = "";
-                dados.reverse().forEach(item => adicionarLinha(item.nome, item.qtd, item.valor, item.pego));
-            } else {
-                adicionarLinha();
+    function filtrar() {
+        const busca = document.getElementById("pesquisa").value.toLowerCase();
+        document.querySelectorAll("#corpoTabela tr").forEach(tr => {
+            const nomeInput = tr.querySelector(".nome-item");
+            if(nomeInput) {
+                const nome = nomeInput.value.toLowerCase();
+                tr.style.display = nome.includes(busca) ? "" : "none";
             }
-        }
-
-        function limparTabela() {
-            if (confirm("Limpar toda a lista?")) {
-                localStorage.removeItem("listaCompras_V3");
-                location.reload();
-            }
-        }
-    </script>
+        });
+    }
+</script>
 </body>
-
 </html>
